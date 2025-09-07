@@ -1,4 +1,5 @@
 import { Heading, Container } from "@chakra-ui/react";
+import { TopCountries } from "@src/components/charts/top-countries";
 
 export default function Home() {
   return (
@@ -6,6 +7,7 @@ export default function Home() {
       <Heading textAlign="center" size="3xl" marginBottom="1rem">
         Covid-19 Charts
       </Heading>
+      <TopCountries />
     </Container>
   );
 }
