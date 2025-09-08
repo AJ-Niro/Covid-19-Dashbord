@@ -26,13 +26,7 @@ import {
 import { getCasesByRange } from "@src/services/cases.service";
 import { formatNumber } from "@src/utils/number";
 import { isValidDate } from "@src/utils/date";
-
-const countries = createListCollection({
-  items: [
-    { label: "All", value: "all" },
-    { label: "Argentina", value: "Argentina" },
-  ],
-});
+import { getCountries } from "@src/services/country.service";
 
 const periods = createListCollection({
   items: [
@@ -48,6 +42,24 @@ export const CasesByPeriodChart = () => {
   const [endDate, setEndDate] = useState("2024-01-31");
   const [country, setCountry] = useState("all");
   const [period, setPeriod] = useState("month");
+
+  const {
+    data: countriesData,
+    isLoading: isCountriesLoading,
+    isError: isCountriesError,
+  } = useQuery({
+    queryKey: ["countries"],
+    queryFn: getCountries,
+  });
+
+  const countries = createListCollection({
+    items: [
+      ...(countriesData?.countries.map((c) => ({
+        label: c,
+        value: c,
+      })) ?? []),
+    ],
+  });
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["casesByRange", period, startDate, endDate, country],
@@ -98,11 +110,7 @@ export const CasesByPeriodChart = () => {
         COVID Cases for {country === "all" ? "all countries" : country}
       </Heading>
 
-      <HStack
-        flexDirection={{ base: "column", md: "row" }}
-        gap={4}
-        mb="1rem"
-      >
+      <HStack flexDirection={{ base: "column", md: "row" }} gap={4} mb="1rem">
         <Field.Root required>
           <Field.Label>Start date</Field.Label>
           <Input
@@ -158,13 +166,14 @@ export const CasesByPeriodChart = () => {
             const selected = details.value[0];
             if (selected) setCountry(selected);
           }}
+          flex="1"
         >
           <Select.HiddenSelect />
           <Select.Label>Country</Select.Label>
 
           <Select.Control>
             <Select.Trigger>
-              <Select.ValueText />
+              {isCountriesLoading ? "Loading..." : <Select.ValueText />}
             </Select.Trigger>
             <Select.IndicatorGroup>
               <Select.Indicator />
@@ -174,12 +183,18 @@ export const CasesByPeriodChart = () => {
 
           <Select.Positioner>
             <Select.Content>
-              {countries.items.map((item) => (
-                <Select.Item item={item} key={item.value}>
-                  {item.label}
-                  <Select.ItemIndicator />
+              {isCountriesError ? (
+                <Select.Item item={{ label: "Error loading", value: "error" }}>
+                  Error
                 </Select.Item>
-              ))}
+              ) : (
+                countries.items.map((item) => (
+                  <Select.Item item={item} key={item.value}>
+                    {item.label}
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))
+              )}
             </Select.Content>
           </Select.Positioner>
         </Select.Root>
