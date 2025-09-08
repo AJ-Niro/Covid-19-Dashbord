@@ -11,9 +11,8 @@ export async function GET() {
     const res = await fetch(`${DISEASE_API_URL}/countries`);
     const json: CountryData[] = await res.json();
 
-    const top10 = json
+    const top = json
       .sort((a, b) => b.cases - a.cases)
-      .slice(0, 10)
       .map((c) => ({
         country: c.country,
         cases: c.cases,
@@ -21,20 +20,20 @@ export async function GET() {
 
     const traceEntry = {
       method: "GET",
-      endpoint: "/api/top10",
+      endpoint: "/api/covid/topCountries",
       status: res.status,
       duration_ms: Date.now() - start,
-      meta: { count: top10.length },
+      meta: { count: top.length },
     };
 
     logTrace(traceEntry);
 
-    return NextResponse.json(top10);
+    return NextResponse.json(top);
   } catch (err: unknown) {
     status = 500;
     logTrace({
       method: "GET",
-      endpoint: "/api/top10",
+      endpoint: "/api/covid/topCountries",
       status,
       error: err instanceof Error ? err.message : "unknown",
     });
