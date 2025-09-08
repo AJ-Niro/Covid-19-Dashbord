@@ -1,5 +1,6 @@
 import { Heading, Container } from "@chakra-ui/react";
 import { TopCountries } from "@src/components/charts/top-countries";
+import { CasesByPeriodChart } from "@src/components/charts/cases-by-period";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
         Covid-19 Charts
       </Heading>
       <TopCountries />
+      <CasesByPeriodChart />
     </Container>
   );
 }
