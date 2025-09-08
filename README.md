@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mini Dashboard COVID-19
 
-## Getting Started
+Este proyecto consiste en un mini-dashboard desarrollado en Next.js que consume datos de COVID-19 desde la API de [Disease.sh](https://disease.sh/)
+y aplica varias transformaciones de datos para visualización.
 
-First, run the development server:
+## Cómo correr
+```
+  npm install
+  npm run dev
+```
+El proyecto correrá por defecto en http://localhost:3000.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Variables de entorno
+
+Configura un archivo .env con las siguientes variables:
+```
+DISEASE_API_URL=https://disease.sh/v3/covid-19
+WEBHOOK_URL=https://webhook.site/tu-id-unico
+```
+DISEASE_API_URL → URL base de la API de Disease.sh.
+
+WEBHOOK_URL → Destino para enviar trazas de ejecución en tiempo real.
+
+## Endpoints implementados
+
+### 1. /api/covid/casesByPeriod
+
+Agrega casos por periodo (day, week, month) dentro de un rango de fechas y país.
+
+**Ejemplo:**
+```
+GET /api/covid/casesByPeriod?period=month&start=2021-01-01&end=2021-03-01&country=USA
+```
+**Response:**
+```json
+{
+  "period": "month",
+  "country": "all",
+  "start": "2021-01-01",
+  "end": "2021-03-01",
+  "aggregated": {
+    "2021-01": 1550000,
+    "2021-02": 1250000,
+    "2021-03": 900000
+  }
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. /api/covid/countryList
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Devuelve la lista de todos los países disponibles en la API para filtros de frontend.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Ejemplo:**
 
-## Learn More
+```
+GET /api/covid/countryList
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Response:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```json
+{
+"countries": [
+  "USA",
+  "India",
+  "Brazil",
+  "UK",
+  "Russia",
+  "France",
+  "Germany"
+  ]
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. /api/covid/rateChange
 
-## Deploy on Vercel
+Calcula la variación porcentual de casos entre periodos consecutivos, usando los datos agregados de casesByPeriod.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Ejemplo:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+GET /api/covid/rateChange?period=month&start=2021-01-01&end=2021-03-01&country=USA
+```
+
+**Response:**
+```json
+{
+  "period": "month",
+  "country": "argentina",
+  "start": "2021-01-01",
+  "end": "2021-03-01",
+  "rateChange": {
+    "2021-01": null,
+    "2021-02": 0.19,
+    "2021-03": -0.28
+  }
+}
+```
+
+### 4. /api/covid/topCountries
+
+Devuelve los países con mayor número de casos dentro de un rango de fechas.
+
+**Ejemplo:**
+
+```
+GET /api/covid/topCountries?start=2021-01-01&end=2021-01-31&n=5
+```
+
+**Response:**
+
+```json
+[
+  { "country": "USA", "cases": 1550000 },
+  { "country": "India", "cases": 980000 },
+  { "country": "Brazil", "cases": 870000 },
+  { "country": "UK", "cases": 720000 },
+  { "country": "Russia", "cases": 610000 }
+]
+```
+
+## Transformaciones implementadas
+
+- Agregación temporal → Casos sumados por periodo.
+
+- Top-N por métrica → Ranking de países (topCountries).
+
+- Rate Change (Variación porcentual) → Comparación de periodos consecutivos.
+
+
+## Decisiones de diseño y trade-offs
+
+- Se eligió Next.js por integrar backend y frontend en un solo proyecto.
+
+- Disease.sh es gratuita, aunque limitada en granularidad histórica.
+
+- Logs de ejecución guardados en JSONL (/logs/http_trace.jsonl) y enviados opcionalmente a WEBHOOK_URL.
+
+- Transformaciones en backend para reducir carga de frontend.
+
+- Validaciones de fechas y país para evitar errores de API externa.
+
+## Declaración de uso de IA
+
+Durante el desarrollo se utilizó ChatGPT (OpenAI, GPT-5) para:
+  - Generar endpoints y utilidades de transformación.
+
+  - Explicar fórmulas y escribir este README.
+
+  - Sugerir decisiones de diseño y trade-offs.
+
+  - Toda la implementación final fue revisada y adaptada manualmente.
