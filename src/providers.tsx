@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
   isServer,
 } from "@tanstack/react-query";
-import * as React from "react";
+import { ChakraUIProvider } from "./components/ui/chakra-ui.provider";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -33,7 +33,7 @@ export function Providers(props: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {props.children}
+      <ChakraUIProvider>{props.children}</ChakraUIProvider>
     </QueryClientProvider>
   );
 }
