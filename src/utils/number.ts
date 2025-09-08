@@ -4,3 +4,8 @@ export const formatNumber = (value: number) => {
   if (value >= 1_000) return (value / 1_000).toFixed(1) + "K";
   return value.toString();
 };
+
+export const formatPercent = (value: number): string => {
+  if (isNaN(value)) return "-";
+  return `${(value * 100).toFixed(2)}%`;
+};
