@@ -3,7 +3,6 @@
 import { BarList, type BarListData, useChart } from "@chakra-ui/charts";
 import { useColorModeValue } from "../ui/color-mode";
 import { Box, Heading, Skeleton, Text } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTopCountries } from "@src/services/country.service";
 
@@ -25,12 +24,6 @@ export const TopCountries = () => {
     data: chartData ?? [],
     series: [{ name: "name", color: barBg }],
   });
-
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return <Skeleton height="480px" />;
 
   if (isLoading) {
     return (
