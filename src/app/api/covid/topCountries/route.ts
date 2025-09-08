@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import { DISEASE_API_URL } from "@src/config/environmentVariables";
-
-export type CountryData = {
-  country: string;
-  cases: number;
-  [key: string]: unknown;
-};
+import { CountryData } from "@src/types/country.type";
 
 export async function GET() {
   const res = await fetch(`${DISEASE_API_URL}/countries`);
