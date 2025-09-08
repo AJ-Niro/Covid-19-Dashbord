@@ -85,7 +85,7 @@ export const CasesByPeriodChart = () => {
 
   if (isLoading) {
     return (
-      <Box>
+      <Box mb="1rem">
         <Heading size="2xl" mb="1rem">
           COVID Cases for {country === "all" ? "all countries" : country}
         </Heading>
@@ -96,7 +96,7 @@ export const CasesByPeriodChart = () => {
 
   if (isError) {
     return (
-      <Box p={4} bg="red.100" borderRadius="md">
+      <Box p={4} bg="red.100" borderRadius="md" mb="1rem">
         <Text color="red.800" fontWeight="bold">
           Error loading data
         </Text>
@@ -105,7 +105,7 @@ export const CasesByPeriodChart = () => {
   }
 
   return (
-    <Box>
+    <Box mb="1rem">
       <Heading size="2xl" mb="1rem">
         COVID Cases for {country === "all" ? "all countries" : country}
       </Heading>

@@ -48,7 +48,7 @@ export const TopCountries = () => {
 
   if (isLoading) {
     return (
-      <Box>
+      <Box mb="1rem">
         <Heading size="2xl" marginBottom="1rem">
           Top {limit} countries with more cases
         </Heading>
@@ -59,7 +59,7 @@ export const TopCountries = () => {
 
   if (isError) {
     return (
-      <Box p={4} bg="red.100" borderRadius="md">
+      <Box p={4} bg="red.100" borderRadius="md" mb="1rem">
         <Text color="red.800" fontWeight="bold">
           Error loading data
         </Text>
@@ -68,7 +68,7 @@ export const TopCountries = () => {
   }
 
   return (
-    <Box>
+    <Box mb="1rem">
       <Heading size="2xl" marginBottom="1rem">
         Top {limit} countries with more cases
       </Heading>
