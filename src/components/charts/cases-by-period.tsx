@@ -166,7 +166,6 @@ export const CasesByPeriodChart = () => {
             const selected = details.value[0];
             if (selected) setCountry(selected);
           }}
-          flex="1"
         >
           <Select.HiddenSelect />
           <Select.Label>Country</Select.Label>
