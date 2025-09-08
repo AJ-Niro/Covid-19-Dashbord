@@ -5,30 +5,24 @@ import { useColorModeValue } from "../ui/color-mode";
 import { Box, Heading } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-
-const fetchTopCountries = async (): Promise<BarListData[]> => {
-  const res = await fetch("/api/covid/topCountries");
-  if (!res.ok) throw new Error("Failed to fetch top countries");
-
-  const json = await res.json();
-
-  return json.map((item: { country: string; cases: number }) => ({
-    name: item.country,
-    value: item.cases,
-  }));
-};
+import { getTopCountries } from "@src/services/country.service";
 
 export const TopCountries = () => {
   const barBg = useColorModeValue("blue.300", "blue.800");
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["topCountries"],
-    queryFn: fetchTopCountries,
+    queryFn: getTopCountries,
   });
+
+  const chartData = data?.map((item) => ({
+    name: item.country,
+    value: item.cases,
+  }));
 
   const chart = useChart<BarListData>({
     sort: { by: "value", direction: "desc" },
-    data: data ?? [],
+    data: chartData ?? [],
     series: [{ name: "name", color: barBg }],
   });
 
@@ -36,7 +30,8 @@ export const TopCountries = () => {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted || isLoading) return <div style={{ height: 300 }}>Loading chart...</div>;
+  if (!mounted || isLoading)
+    return <div style={{ height: 300 }}>Loading chart...</div>;
   if (isError) return <div>Error loading data</div>;
 
   return (
