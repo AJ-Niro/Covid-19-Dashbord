@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { DISEASE_API_URL } from "@src/config/environmentVariables";
 import { CountryData } from "@src/types/country.type";
 import { logTrace } from "@src/utils/logger";
+import { sendWebhook } from "@src/utils/webhook";
 
 export async function GET() {
   const start = Date.now();
@@ -27,6 +28,14 @@ export async function GET() {
     };
 
     logTrace(traceEntry);
+
+    sendWebhook({
+      event: "TOP_CASES_PER_COUNTRY",
+      timestamp: new Date().toISOString(),
+      status: res.status,
+      duration_ms: Date.now() - start,
+      data: top,
+    });
 
     return NextResponse.json(top);
   } catch (err: unknown) {
