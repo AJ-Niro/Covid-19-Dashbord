@@ -2,48 +2,7 @@ import { NextResponse } from "next/server";
 import { DISEASE_API_URL } from "@src/config/environmentVariables";
 import { logTrace } from "@src/utils/logger";
 import { sendWebhook } from "@src/utils/webhook";
-import { isValidDate, parseApiDate } from "@src/utils/date";
-
-function groupByPeriod(
-  data: Record<string, number>,
-  period: "day" | "week" | "month",
-  start?: string,
-  end?: string
-) {
-  const result: Record<string, number> = {};
-
-  for (const [dateStr, value] of Object.entries(data)) {
-    const iso = parseApiDate(dateStr);
-
-    if (start && iso < start) continue;
-    if (end && iso > end) continue;
-
-    let key = iso;
-    if (period === "week") {
-      const d = new Date(iso);
-      d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
-      const week1 = new Date(d.getFullYear(), 0, 4);
-      const week =
-        1 +
-        Math.round(
-          ((d.getTime() - week1.getTime()) / 86400000 -
-            3 +
-            ((week1.getDay() + 6) % 7)) /
-            7
-        );
-
-      key = `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
-    }
-    if (period === "month") {
-      const [year, month] = iso.split("-");
-      key = `${year}-${month}`;
-    }
-
-    result[key] = (result[key] || 0) + value;
-  }
-
-  return result;
-}
+import { isValidDate, groupByPeriod } from "@src/utils/date";
 
 export async function GET(req: Request) {
   const startTime = Date.now();
